@@ -1,0 +1,16 @@
+{
+  "sidebar": {
+    "world": "Welt",
+    "entities": "Entitäten",
+    "triggers": "Auslöser"
+  },
+  "navbar": {
+    "title": "Karten-Editor",
+    "themeToggle": "Theme umschalten"
+  },
+  "Metadata": {
+    "title": "Erlebnis-Editor",
+    "description": "Erlebnis-Editor",
+    "keywords": "Erlebnis-Editor"
+  }
+} 

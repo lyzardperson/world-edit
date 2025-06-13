@@ -1,0 +1,17 @@
+{
+  "sidebar": {
+    "world": "World",
+    "entities": "Entities",
+    "triggers": "Triggers",
+    "toggle": "Toggle"
+  },
+  "navbar": {
+    "title": "Map Creator",
+    "themeToggle": "Toggle theme"
+  },
+  "Metadata": {
+    "title": "Experience Editor",
+    "description": "Experience Editor",
+    "keywords": "Experience Editor"
+  }
+} 

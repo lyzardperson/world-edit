@@ -1,0 +1,16 @@
+{
+    "sidebar": {
+        "world": "العالم",
+        "entities": "الكيانات",
+        "triggers": "التفعيلات"
+    },
+    "navbar": {
+        "title": "محرر التجربة",
+        "themeToggle": "تبديل السمة"
+    },
+    "Metadata": {
+        "title": "محرر التجربة",
+        "description": "محرر التجربة",
+        "keywords": "محرر التجربة"
+    }
+}

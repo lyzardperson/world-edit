@@ -1,0 +1,16 @@
+{
+  "sidebar": {
+    "world": "Мир",
+    "entities": "Объекты",
+    "triggers": "Триггеры"
+  },
+  "navbar": {
+    "title": "Редактор карт",
+    "themeToggle": "Переключить тему"
+  },
+  "Metadata": {
+    "title": "Редактор опыта",
+    "description": "Редактор опыта", 
+    "keywords": "Редактор опыта"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "sidebar": {
+    "world": "Monde",
+    "entities": "Entités",
+    "triggers": "Déclencheurs"
+  },
+  "navbar": {
+    "title": "Créateur de Cartes",
+    "themeToggle": "Changer le thème"
+  },
+  "Metadata": {
+    "title": "Éditeur d'expériences",
+    "description": "Éditeur d'expériences",
+    "keywords": "Éditeur d'expériences"
+  }
+}   

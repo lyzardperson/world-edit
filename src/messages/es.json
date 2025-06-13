@@ -1,0 +1,22 @@
+{
+  "sidebar": {
+    "world": "Mundo",
+    "entities": "Entidades",
+    "triggers": "Disparadores",
+    "toggle": "Toggle",
+    "expand": "",
+    "collapse": ""
+  },
+  "navbar": {
+    "title": "Creador de mapas",
+    "themeToggle": "Cambiar tema"
+  },
+  "Metadata": {
+    "title": "Editor de experiencias",
+    "description": "Editor de experiencias",
+    "keywords": "Editor de experiencias"
+  },
+  "ui":{
+    "buttton": ""
+  }
+} 
