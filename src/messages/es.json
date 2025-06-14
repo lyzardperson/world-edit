@@ -1,11 +1,11 @@
 {
   "sidebar": {
-    "world": "Mundo",
-    "entities": "Entidades",
-    "triggers": "Disparadores",
-    "toggle": "Toggle",
-    "expand": "",
-    "collapse": ""
+  "world": "Mundo",
+  "entities": "Entidades",
+  "triggers": "Disparadores",
+  "toggle": "Alternar",
+  "expand": "Expandir",
+  "collapse": "Colapsar"
   },
   "navbar": {
     "title": "Creador de mapas",
@@ -18,5 +18,11 @@
   },
   "ui":{
     "buttton": ""
+  },
+  "contextMenu":{
+    "addView": "Añadir vista",
+    "moveToTab": "Mover a pestaña...",
+    "cloneView": "Duplicar vista",
+    "worldEditorTitle": "Mapa A"
   }
 } 

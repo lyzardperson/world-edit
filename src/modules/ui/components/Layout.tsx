@@ -58,7 +58,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           onCollapseChange={() => {}}
         />
         <motion.main
-          className="flex-1 overflow-auto p-4"
+          className="flex-1 overflow-auto md:p-4"
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -20, opacity: 0 }}

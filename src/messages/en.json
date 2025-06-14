@@ -13,5 +13,11 @@
     "title": "Experience Editor",
     "description": "Experience Editor",
     "keywords": "Experience Editor"
+  },
+  "contextMenu":{
+    "addView": "Añadir vista",
+    "moveToTab": "Mover a pestaña...",
+    "cloneView": "Duplicar vista",
+    "worldEditorTitle": "Mapa A"
   }
 } 

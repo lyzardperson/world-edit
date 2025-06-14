@@ -10,7 +10,7 @@ const VARIANT_MAP = {
   secondary: "btn btn-secondary",
   accent: "btn btn-accent",
   outline: "btn btn-outline",
-  ghost: "btn btn-ghost hover:glass",
+  ghost: "btn btn-ghost hover:bg-transparent",
 };
 const SIZE_MAP = {
   xs: "btn-xs",

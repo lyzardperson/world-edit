@@ -1,0 +1,20 @@
+[
+  {
+    "i18nKey": "world",
+    "href": "world",
+    "icon": "GlobeIcon",
+    "modalI18nKey": null
+  },
+  {
+    "i18nKey": "entities",
+    "href": "entities",
+    "icon": "BoxesIcon",
+    "modalI18nKey": null
+  },
+  {
+    "i18nKey": "triggers",
+    "href": "triggers",
+    "icon": "ZapIcon",
+    "modalI18nKey": null
+  }
+]

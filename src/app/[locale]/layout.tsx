@@ -10,6 +10,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "../globals.css";
 import { routing } from "@/modules/libs/i18n/routing";
 import { ThemeProvider } from "next-themes";
+import { ContextMenuProvider } from "@/modules/ui/components/context-menu/provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -90,7 +91,7 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased `}
         suppressHydrationWarning
       >
         <ThemeProvider
@@ -98,7 +99,11 @@ export default async function RootLayout({
           themes={["dracula", "vscode-light", "blender", "unity-dark"]}
           defaultTheme="dracula"
         >
-          <NextIntlClientProvider>{children}</NextIntlClientProvider>
+          <NextIntlClientProvider>
+            <ContextMenuProvider>
+              {children}
+            </ContextMenuProvider>
+          </NextIntlClientProvider>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

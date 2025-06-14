@@ -1,39 +1,47 @@
-"use client"
+// src/ui/sidebar/components/Sidebar.tsx
+"use client";
 
-import React from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
-import classNames from "classnames"
-import { motion, AnimatePresence } from "framer-motion"
-import { ChevronLeft, ChevronRight, X as CloseIcon } from "lucide-react"
-import { NAV_ITEMS, SIDEBAR_ANIMATION_VARIANTS } from "./constants"
-import { useTranslations } from "next-intl"
-import { Button } from "../Button"
-import { useResponsive } from "@/modules/hooks/useResponsive"
+import React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import classNames from "classnames";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronLeft, ChevronRight, X as CloseIcon } from "lucide-react";
+import navItems from "@/constants/hotkeys/nav-items.json";
+import { useTranslations } from "next-intl";
+import { Button } from "../Button";
+import { useResponsive } from "@/modules/hooks/useResponsive";
 
-export const Sidebar: React.FC<{
-  isOpen: boolean
-  onRequestClose: () => void
-  onCollapseChange?: (collapsed: boolean) => void
-}> = ({ isOpen, onRequestClose, onCollapseChange }) => {
-  const path = usePathname() || ""
-  const t = useTranslations("sidebar")
-  const [isCollapsed, setIsCollapsed] = React.useState(false)
-  const { isMobile } = useResponsive()
+export interface SidebarProps {
+  isOpen: boolean;
+  onRequestClose: () => void;
+  onCollapseChange?: (collapsed: boolean) => void;
+}
+
+export const Sidebar: React.FC<SidebarProps> = ({
+  isOpen,
+  onRequestClose,
+  onCollapseChange,
+}) => {
+  const t = useTranslations("sidebar");
+  const path = usePathname() || "";
+  const { isMobile } = useResponsive();
+  const [collapsed, setCollapsed] = React.useState(false);
 
   const toggleCollapse = () => {
-    const next = !isCollapsed
-    setIsCollapsed(next)
-    onCollapseChange?.(next)
-  }
+    const next = !collapsed;
+    setCollapsed(next);
+    onCollapseChange?.(next);
+  };
 
-  const collapsed = isMobile ? false : isCollapsed
-  const widthClass = collapsed ? "w-16" : "w-60"
+  // on mobile, sidebar is always expanded
+  const isCollapsed = isMobile ? false : collapsed;
+  const widthClass = isCollapsed ? "w-16" : "w-60";
 
   const getRelative = (href: string) =>
-    href.startsWith("/es/editor/") ? href.slice(11) : href
+    href.startsWith("/es/editor/") ? href.slice(11) : href;
 
-  // MOBILE DRAWER
+  // MOBILE
   if (isMobile) {
     return (
       <AnimatePresence>
@@ -47,7 +55,7 @@ export const Sidebar: React.FC<{
             <div
               className="absolute inset-0 bg-black/40 backdrop-blur-sm"
               onClick={onRequestClose}
-              aria-label="Close sidebar"
+              aria-label={t("toggle")}
             />
 
             <motion.aside
@@ -65,109 +73,79 @@ export const Sidebar: React.FC<{
                   size="sm"
                   noAnimation
                   onClick={onRequestClose}
-                  aria-label="Close menu"
+                  aria-label={t("toggle")}
                 >
                   <CloseIcon className="w-6 h-6" />
                 </Button>
               </div>
 
-              {/* Corregido: Añadido padding vertical para evitar recorte de texto */}
-              <nav className="relative flex-1 px-4 py-2">
-                <AnimatePresence>
-                  {NAV_ITEMS.map((item, idx) =>
-                    getRelative(path) === getRelative(item.href) ? (
-                      <motion.div
-                        key="active-indicator"
-                        className="absolute inset-x-4 bg-primary rounded-md"
-                        initial={{ opacity: 0, y: 0 }}
-                        animate={{ 
-                          opacity: 1, 
-                          // Corregido: Alineación vertical precisa
-                          y: idx * (40) // 40px de altura + 8px de espacio
-                        }}
-                        exit={{ opacity: 0 }}
-                        style={{ height: 40 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 280,
-                          damping: 50,
-                          mass: 0.8,
-                        }}
-                      />
-                    ) : null
-                  )}
-                </AnimatePresence>
+              <nav className="flex-1 px-4 py-2 space-y-2">
+                {navItems.map(({ i18nKey, href, icon }) => {
+                  const isActive =
+                    getRelative(path) === getRelative(href);
+                  const ItemIcon = (require("lucide-react")[icon] ||
+                    CloseIcon) as React.FC<{ className: string }>;
 
-                {/* Corregido: Espaciado consistente y altura fija */}
-                <div className="space-y-2">
-                  {NAV_ITEMS.map(({ i18nKey, href, Icon }) => {
-                    const isActive = getRelative(path) === getRelative(href)
-                    return (
-                      <Button
-                        key={href}
-                        as={Link}
-                        href={href}
-                        variant="ghost"
-                        block
-                        noAnimation
-                        onClick={onRequestClose}
-                        className={classNames(
-                          "justify-start h-10",
-                          "transition-colors duration-200", // Suavizar transiciones
-                          {
-                            "text-primary-content": isActive,
-                            "hover:bg-base-300": !isActive,
-                            "active:bg-base-300": !isActive,
-                          }
-                        )}
-                      >
-                        <Icon className="h-5 w-5 mr-2" />
-                        {t(i18nKey)}
-                      </Button>
-                    )
-                  })}
-                </div>
+                  return (
+                    <Button
+                      key={href}
+                      as={Link}
+                      href={href}
+                      variant="ghost"
+                      block
+                      noAnimation
+                      onClick={onRequestClose}
+                      className={classNames(
+                        "justify-start h-10 transition-colors duration-200",
+                        {
+                          "text-primary-content": isActive,
+                          "hover:bg-base-300": !isActive,
+                          "active:bg-base-300": !isActive,
+                        }
+                      )}
+                    >
+                      <ItemIcon className="h-5 w-5 mr-2" />
+                      {t(i18nKey)}
+                    </Button>
+                  );
+                })}
               </nav>
             </motion.aside>
           </motion.div>
         )}
       </AnimatePresence>
-    )
+    );
   }
 
-  // DESKTOP SIDEBAR
+  // DESKTOP
   return (
     <motion.aside
       className={classNames(
-        "bg-base-200 text-base-content flex flex-col transition-all duration-200 ease-in-out",
-        widthClass,
-        "z-10"
+        "bg-base-200 text-base-content flex flex-col transition-all duration-200 ease-in-out z-10",
+        widthClass
       )}
       initial="hidden"
       animate="visible"
       exit="exit"
-      variants={SIDEBAR_ANIMATION_VARIANTS}
+      variants={{
+        hidden: { width: 0 },
+        visible: { width: isCollapsed ? 64 : 240 },
+        exit: { width: 0 },
+      }}
       transition={{ type: "tween", duration: 0.2 }}
       layout
     >
-      {/* Corregido: Añadido padding vertical */}
       <nav className="mt-4 flex-1 space-y-1 relative px-2">
         <AnimatePresence>
-          {NAV_ITEMS.map((item, idx) => {
-            const isActive = getRelative(path) === getRelative(item.href)
+          {navItems.map((item, idx) => {
+            const rel = getRelative(path);
+            const isActive = rel === getRelative(item.href);
             return isActive ? (
               <motion.div
                 key="active-indicator"
-                className={classNames(
-                  "absolute inset-x-0 bg-primary  rounded-md z-10",
-                  collapsed ? "mx-2" : "mx-2" 
-                )}
+                className="absolute inset-x-0 bg-primary rounded-md z-10 mx-2"
                 initial={{ opacity: 0, y: 0 }}
-                animate={{ 
-                  opacity: 1, 
-                  // Corregido: Cálculo preciso de posición
-                  y: idx * (40) // 40px de altura + 4px de espacio
-                }}
+                animate={{ opacity: 1, y: idx * 44 }}
                 exit={{ opacity: 0 }}
                 style={{ height: 40 }}
                 transition={{
@@ -178,12 +156,16 @@ export const Sidebar: React.FC<{
                 }}
                 layoutId="active-bg"
               />
-            ) : null
+            ) : null;
           })}
         </AnimatePresence>
 
-        {NAV_ITEMS.map(({ i18nKey, href, Icon }) => {
-          const isActive = getRelative(path) === getRelative(href)
+        {navItems.map(({ i18nKey, href, icon }) => {
+          const rel = getRelative(path);
+          const isActive = rel === getRelative(href);
+          const ItemIcon = (require("lucide-react")[icon] ||
+            ChevronLeft) as React.FC<{ className: string }>;
+
           return (
             <Button
               key={href}
@@ -193,38 +175,34 @@ export const Sidebar: React.FC<{
               block
               noAnimation
               className={classNames(
-                "justify-start h-10 relative z-20",
-                "transition-colors duration-200", 
+                "justify-start h-10 relative z-20 transition-colors duration-200",
                 {
                   "text-primary-content": isActive,
                   "hover:bg-primary-800": !isActive,
-                  "active:bg-base-500 active:glass active:border-2 active:border-green-500": !isActive,
+                  "active:bg-base-500 active:glass active:border-2 active:border-green-500":
+                    !isActive,
                 },
-                collapsed ? "px-2" : "px-3" 
+                isCollapsed ? "px-2" : "px-3"
               )}
             >
-              <Icon
+              <ItemIcon
                 className={classNames("h-5 w-5", {
-                  "mr-3": !collapsed, 
+                  "mr-3": !isCollapsed,
                 })}
               />
-              {!collapsed && <span>{t(i18nKey)}</span>}
+              {!isCollapsed && <span>{t(i18nKey)}</span>}
             </Button>
-          )
+          );
         })}
       </nav>
 
-      <div className="p-4 border-base-300 brightness-75 hover:brightness-100">
+      <div className="p-4 border-t border-base-300 brightness-75 hover:brightness-100">
         <Button
           onClick={toggleCollapse}
           variant="ghost"
           block
           noAnimation
-          className={classNames(
-            "justify-center h-10",
-            "hover:bg-base-300", 
-            collapsed ? "px-2" : "px-4"
-          )}
+          className="justify-center h-10"
           aria-label={collapsed ? t("expand") : t("collapse")}
         >
           {collapsed ? (
@@ -238,5 +216,5 @@ export const Sidebar: React.FC<{
         </Button>
       </div>
     </motion.aside>
-  )
-}
+  );
+};
