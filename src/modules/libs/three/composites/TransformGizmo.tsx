@@ -1,73 +1,84 @@
-// modules/libs/three/tools/transform/TransformGizmo.tsx
 "use client";
 
-import React, { useRef, useEffect } from "react";
-import type { TransformControls } from "@react-three/drei";
-import { useThree } from "@react-three/fiber";
-import { TransformSettings } from "../types";
+import { TransformControls as ThreeTransformControls } from "three-stdlib";
+import { TransformControls } from "@react-three/drei";
+import { useThree, ThreeEvent } from "@react-three/fiber";
+import React, { useRef, ReactElement } from "react";
+import * as THREE from "three";
+
+export interface TransformSettings {
+  target: THREE.Object3D | null;
+  mode: "translate" | "rotate" | "scale";
+  size?: number;
+  space?: "world" | "local";
+  snapTranslate?: number | null;
+  snapRotate?: number | null;
+  snapScale?: number | null;
+}
 
 interface TransformGizmoProps {
-  /** Initial settings and target object to manipulate */
+  /** Settings and the target object to manipulate. */
   settings: TransformSettings;
-  /** Called whenever the object transforms */
-  onChange?: (updated: TransformSettings) => void;
-  /** Any children (usually the mesh you want to manipulate) */
-  children: React.ReactNode;
+  /**
+   * Called whenever the user manipulates the object.
+   * Provides a fresh snapshot of position/rotation/scale.
+   */
+  onChange?: (updated: {
+    position: [number, number, number];
+    rotation: [number, number, number];
+    scale: [number, number, number];
+  }) => void;
+  /** Called when the gizmo's dragging state changes. */
+  onDraggingChanged?: (dragging: boolean) => void;
+  /** Child object to be controlled by the gizmo. */
+  children?: ReactElement<THREE.Object3D>;
 }
 
 /**
- * A wrapper around Drei's TransformControls that:
- *  - applies incoming settings
- *  - listens for objectChange events to report back world transforms
+ * Wraps Drei’s TransformControls to:
+ *  1. Apply incoming settings (mode, snapping, space).
+ *  2. Emit `onChange` with updated transform data.
+ *  3. Emit `onDraggingChanged` when dragging state changes.
  */
 export const TransformGizmo: React.FC<TransformGizmoProps> = ({
   settings,
-  onChange,
+  onChange: onGizmoChange,
+  onDraggingChanged, // This is the callback prop from the parent
   children,
 }) => {
-  const { camera, gl, scene } = useThree();
-  const controlsRef = useRef<TransformControls | null>(null);
+  const { camera, gl } = useThree();
+  const controlsRef = useRef<ThreeTransformControls | null>(null);
 
-  // Apply settings (mode, snapping, etc.) whenever they change
-  useEffect(() => {
-    const ctrl = controlsRef.current;
-    if (!ctrl) return;
+  // Handler for when the gizmo starts being dragged
+  const handleGizmoPointerDown = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation(); // Prevent event from bubbling to OrbitControls
+    if (onDraggingChanged) {
+      onDraggingChanged(true); // Notify parent that dragging has started
+    }
+  };
 
-    ctrl.setMode(settings.mode);
-    ctrl.setSize(settings.size);
-    ctrl.setSpace(settings.space);
-    ctrl.setTranslationSnap(settings.snapTranslate ?? undefined);
-    ctrl.setRotationSnap(settings.snapRotate ?? undefined);
-    ctrl.setScaleSnap(settings.snapScale ?? undefined);
-  }, [
-    settings.mode,
-    settings.size,
-    settings.space,
-    settings.snapTranslate,
-    settings.snapRotate,
-    settings.snapScale,
-  ]);
+  // Handler for when the gizmo stops being dragged
+  const handleGizmoPointerUp = (event: ThreeEvent<PointerEvent>) => {
+    event.stopPropagation(); // Prevent event from bubbling to OrbitControls
+    if (onDraggingChanged) {
+      onDraggingChanged(false); // Notify parent that dragging has stopped
+    }
+  };
 
-  // Listen for object changes and propagate new transform
-  useEffect(() => {
-    const ctrl = controlsRef.current;
-    if (!ctrl || !onChange) return;
-
-    const handleChange = () => {
-      const obj = settings.target;
-      onChange({
-        ...settings,
-        position: [obj.position.x, obj.position.y, obj.position.z],
-        rotation: [obj.rotation.x, obj.rotation.y, obj.rotation.z],
-        scale: [obj.scale.x, obj.scale.y, obj.scale.z],
+  const handleControlsChange = () => {
+    if (onGizmoChange && settings.target) {
+      const { position, rotation, scale } = settings.target;
+      onGizmoChange({
+        position: position.toArray() as [number, number, number],
+        rotation: [rotation.x, rotation.y, rotation.z],
+        scale: scale.toArray() as [number, number, number],
       });
-    };
+    }
+  };
 
-    ctrl.addEventListener("objectChange", handleChange);
-    return () => {
-      ctrl.removeEventListener("objectChange", handleChange);
-    };
-  }, [onChange, settings]);
+  if (!settings.target) {
+    return null; // Don't render gizmo if no target
+  }
 
   return (
     <TransformControls
@@ -75,6 +86,16 @@ export const TransformGizmo: React.FC<TransformGizmoProps> = ({
       object={settings.target}
       camera={camera}
       domElement={gl.domElement}
+      onChange={handleControlsChange}
+      // Use pointer events to manage dragging state
+      onPointerDown={handleGizmoPointerDown}
+      onPointerUp={handleGizmoPointerUp}
+      mode={settings.mode}
+      size={settings.size}
+      space={settings.space}
+      translationSnap={settings.snapTranslate ?? undefined}
+      rotationSnap={settings.snapRotate ?? undefined}
+      scaleSnap={settings.snapScale ?? undefined}
     >
       {children}
     </TransformControls>
