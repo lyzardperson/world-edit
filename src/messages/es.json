@@ -19,10 +19,41 @@
   "ui":{
     "buttton": ""
   },
+  "worldEditor": {
+    "toolbar": {
+      "brushes": "Pinceles",
+      "terrainBrush": "Terreno",
+      "unitsBrush": "Unidades",
+      "elementsBrush": "Elementos",
+      "viewports": "Viewports",
+      "addView": "Añadir Vista",
+      "adjustLayout": "Ajustar Layout",
+      "layoutSingle": "Única",
+      "layoutDoubleVertical": "Doble Vertical",
+      "layoutDoubleHorizontal": "Doble Horizontal",
+      "layoutTripleVertical": "Triple Vertical",
+      "layoutTripleHorizontal": "Triple Horizontal",
+      "layoutQuad": "Cuádruple",
+      "noLayoutsAvailable": "No hay layouts disponibles",
+      "terrainPaintBrush": "Pintar Terreno",
+      "terrainSculptBrush": "Esculpir Terreno",
+      "terrainDetailSubmenu": "Detalles del Terreno",
+      "terrainGrassBrush": "Pincel de Hierba",
+      "terrainRocksBrush": "Pincel de Rocas",
+      "advancedTerrainOptions": "Opciones Avanzadas Terreno",
+      "textureSettings": "Ajustes de Textura",
+      "layoutTriple2T1B": "Triple (2 Arriba, 1 Abajo)",
+      "layoutTriple1T2B": "Triple (1 Arriba, 2 Abajo)",
+      "layoutTriple2L1R": "Triple (2 Izquierda, 1 Derecha)",
+      "layoutTriple1L2R": "Triple (1 Izquierda, 2 Derecha)"
+    }
+  },
   "contextMenu":{
     "addView": "Añadir vista",
     "moveToTab": "Mover a pestaña...",
     "cloneView": "Duplicar vista",
-    "worldEditorTitle": "Mapa A"
+    "worldEditorTitle": "Mapa A",
+    "assignHotkey": "Asignar Tecla Rápida",
+    "deleteView": "Eliminar Vista"
   }
-} 
+}

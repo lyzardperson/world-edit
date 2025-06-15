@@ -1,38 +1,19 @@
 "use client";
 
 import React from "react";
-import { Button } from "@/modules/ui/components/Button";
-import type { CameraSettings } from "../../../types";
 
-interface ToolbarProps {
-  onSaveSettings?: (settings: CameraSettings) => void;
-  onResetSettings?: () => void;
-  captureCurrentSettings: () => CameraSettings | null;
-}
+// Ya no se necesitan props si los botones se eliminan
+interface ToolbarProps {}
 
-export const Toolbar: React.FC<ToolbarProps> = ({
-  onSaveSettings,
-  onResetSettings,
-  captureCurrentSettings,
-}) => {
-  return (
-    <div className="absolute top-4 right-4 flex gap-2 bg-background/80 backdrop-blur-md p-2 rounded shadow-lg z-10">
-      <Button
-        size="sm"
-        onClick={() => {
-          const current = captureCurrentSettings();
-          if (current && onSaveSettings) onSaveSettings(current);
-        }}
-      >
-        Save
-      </Button>
-      <Button
-        size="sm"
-        variant="outline"
-        onClick={() => onResetSettings?.()}
-      >
-        Reset
-      </Button>
-    </div>
-  );
+export const Toolbar: React.FC<ToolbarProps> = () => {
+  // Opción 1: Devolver null si la barra ya no debe renderizarse en absoluto.
+  return null;
+
+  // Opción 2: Devolver el div vacío si quieres mantener la estructura para futuro uso, 
+  // pero sin los botones de Save/Reset.
+  // return (
+  //   <div className="absolute top-4 right-4 flex gap-2 bg-background/80 backdrop-blur-md p-2 rounded shadow-lg z-10">
+  //     {/* No hay contenido de botones aquí */}
+  //   </div>
+  // );
 };

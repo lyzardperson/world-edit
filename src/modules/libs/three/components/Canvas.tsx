@@ -1,15 +1,24 @@
 "use client";
 
 import React from "react";
-import { Canvas as R3FCanvas, CanvasProps } from "@react-three/fiber";
+import { Canvas as R3FCanvas, type CanvasProps as R3FCanvasProps } from "@react-three/fiber";
 
-export const Canvas: React.FC<CanvasProps> = (props) => (
-  <R3FCanvas
-    shadows
-    gl={{ antialias: true }}
-    camera={{ position: [5, 5, 5], fov: 50 }}
-    {...props}
-  >
-    {props.children}
-  </R3FCanvas>
-);
+export interface CanvasProps extends R3FCanvasProps {
+  style?: React.CSSProperties;
+}
+
+export const Canvas: React.FC<CanvasProps> = ({ style, ...props }) => {
+  return (
+    <div className="w-full h-full relative">
+      <R3FCanvas
+        shadows
+        gl={{ antialias: true, ...props.gl }}
+        {...props}
+        style={style}
+        className={`${props.className || ""}`}
+      >
+        {props.children}
+      </R3FCanvas>
+    </div>
+  );
+};

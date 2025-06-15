@@ -26,63 +26,86 @@ interface SceneContentProps {
     rotation: [number, number, number];
     scale: [number, number, number];
   }) => void;
-  isGizmoDragging: boolean; // New prop
-  onGizmoDragChange: (dragging: boolean) => void; // New prop
+  isGizmoDragging: boolean;
+  onGizmoDragChange: (dragging: boolean) => void;
+  onContextMenu?: (event: React.MouseEvent) => void;
+  // New props for canvas sizing
+  canvasWidth?: number;
+  canvasHeight?: number;
+  showDebugInfo?: boolean;
 }
 
 export const SceneContent: React.FC<SceneContentProps> = ({
   cameraMode,
   cameraRef,
   showGrid,
-  targetObject, // Consumed directly
-  meshRefCallback, // Used for the initial mesh
+  targetObject,
+  meshRefCallback,
   transformGizmoSettings,
   handleGizmoChange,
   isGizmoDragging,
   onGizmoDragChange,
+  onContextMenu,
+  canvasWidth,
+  canvasHeight,
+  showDebugInfo,
 }) => {
+  // Log canvas dimensions when they change
+  React.useEffect(() => {
+    if (canvasWidth && canvasHeight) {
+      console.log(`[SceneContent] Received canvas dimensions:`, { canvasWidth, canvasHeight });
+    }
+  }, [canvasWidth, canvasHeight]);
+
+  // Determine canvas style - use calculated dimensions if available, otherwise fall back to full size
+  const canvasStyle: React.CSSProperties = {
+    width: canvasWidth ? `${canvasWidth}px` : '100%',
+    height: canvasHeight ? `${canvasHeight}px` : '100%',
+    border: showDebugInfo ? '2px solid yellow' : undefined,
+  };
+
+  console.log(`[SceneContent] Applying canvas style:`, canvasStyle);
+
   return (
-    <Canvas>
-      {cameraMode === "orthographic" ? (
-        <DefaultOrthographicCamera ref={cameraRef as React.RefObject<OrthographicCamera>} />
-      ) : (
-        <DefaultPerspectiveCamera ref={cameraRef as React.RefObject<PerspectiveCamera>} />
+    <div className="w-full h-full relative">
+      {showDebugInfo && (
+        <div className="absolute top-2 left-2 bg-black bg-opacity-75 text-white p-2 text-xs z-10 rounded">
+          Canvas: {canvasWidth}×{canvasHeight}
+        </div>
       )}
-      {/* OrbitControls are disabled when isGizmoDragging is true */}
-      <Controls enabled={!isGizmoDragging} />
-      <EnvironmentComponent />
-      <Lights />
-      {showGrid && <GridComponent />}
-
-      {/* Render the target mesh. It will be created once and its ref captured. */}
-      <mesh ref={meshRefCallback} name="controllableBox" visible={!!targetObject}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial color="royalblue" />
-      </mesh>
-
-      {/* 
-        Conditionally render TransformGizmo if a targetObject exists and settings are available.
-        TransformGizmo will operate on the targetObject obtained via transformGizmoSettings.
-        The actual mesh is already in the scene.
-        The children of TransformGizmo here is the visual representation of the object
-        that TransformControls will attach to.
-      */}
-      {targetObject && transformGizmoSettings && (
-        <TransformGizmo
-          settings={transformGizmoSettings} // This contains the targetObject
-          onChange={handleGizmoChange}
-          onDraggingChanged={onGizmoDragChange}
+      <Canvas 
+        style={canvasStyle}
+        onContextMenu={onContextMenu}
+      >
+        {cameraMode === "orthographic" ? (
+          <DefaultOrthographicCamera
+            ref={cameraRef as React.RefObject<OrthographicCamera>}
+          />
+        ) : (
+          <DefaultPerspectiveCamera
+            ref={cameraRef as React.RefObject<PerspectiveCamera>}
+          />
+        )}
+        <Controls enabled={!isGizmoDragging} />
+        <EnvironmentComponent />
+        <Lights />
+        {showGrid && <GridComponent />}
+        <mesh
+          ref={meshRefCallback}
+          name="controllableBox"
+          visible={!!targetObject}
         >
-          {/* 
-            The TransformControls component (inside TransformGizmo) will attach to 
-            settings.target (which is targetObject).
-            The child <primitive object={targetObject} /> ensures that the gizmo's transformations
-            are applied to this specific instance in the React component tree,
-            and that it's the 'thing' the user clicks on to interact with the gizmo.
-          */}
-          <primitive object={targetObject} />
-        </TransformGizmo>
-      )}
-    </Canvas>
+          <boxGeometry args={[1, 1, 1]} />
+          <meshStandardMaterial color="royalblue" />
+        </mesh>
+        {targetObject && transformGizmoSettings && (
+          <TransformGizmo
+            settings={transformGizmoSettings}
+            onChange={handleGizmoChange}
+            onDraggingChanged={onGizmoDragChange}
+          />
+        )}
+      </Canvas>
+    </div>
   );
 };

@@ -2,9 +2,15 @@
 
 import { TransformControls as ThreeTransformControls } from "three-stdlib";
 import { TransformControls } from "@react-three/drei";
-import { useThree, ThreeEvent } from "@react-three/fiber";
-import React, { useRef, ReactElement } from "react";
+import { useThree } from "@react-three/fiber";
+import React, { useRef, ReactElement, useEffect } from "react";
 import * as THREE from "three";
+
+// Define a more specific type for TransformControls that includes custom events
+type TransformControlsWithCustomEvents = ThreeTransformControls & {
+  addEventListener(type: "dragging-changed", listener: (event: THREE.Event & { type: "dragging-changed"; value: boolean }) => void): void;
+  removeEventListener(type: "dragging-changed", listener: (event: THREE.Event & { type: "dragging-changed"; value: boolean }) => void): void;
+};
 
 export interface TransformSettings {
   target: THREE.Object3D | null;
@@ -19,10 +25,7 @@ export interface TransformSettings {
 interface TransformGizmoProps {
   /** Settings and the target object to manipulate. */
   settings: TransformSettings;
-  /**
-   * Called whenever the user manipulates the object.
-   * Provides a fresh snapshot of position/rotation/scale.
-   */
+
   onChange?: (updated: {
     position: [number, number, number];
     rotation: [number, number, number];
@@ -43,27 +46,26 @@ interface TransformGizmoProps {
 export const TransformGizmo: React.FC<TransformGizmoProps> = ({
   settings,
   onChange: onGizmoChange,
-  onDraggingChanged, // This is the callback prop from the parent
+  onDraggingChanged,
   children,
 }) => {
   const { camera, gl } = useThree();
   const controlsRef = useRef<ThreeTransformControls | null>(null);
 
-  // Handler for when the gizmo starts being dragged
-  const handleGizmoPointerDown = (event: ThreeEvent<PointerEvent>) => {
-    event.stopPropagation(); // Prevent event from bubbling to OrbitControls
-    if (onDraggingChanged) {
-      onDraggingChanged(true); // Notify parent that dragging has started
+  useEffect(() => {
+    // Cast currentControls to our more specific type
+    const currentControls = controlsRef.current as TransformControlsWithCustomEvents;
+    if (currentControls && onDraggingChanged) {
+      const draggingChangedListener = (event: THREE.Event & { type: "dragging-changed"; value: boolean }) => {
+        onDraggingChanged(event.value);
+      };
+      // Calls should now type-check without casting the listener
+      currentControls.addEventListener("dragging-changed", draggingChangedListener);
+      return () => {
+        currentControls.removeEventListener("dragging-changed", draggingChangedListener);
+      };
     }
-  };
-
-  // Handler for when the gizmo stops being dragged
-  const handleGizmoPointerUp = (event: ThreeEvent<PointerEvent>) => {
-    event.stopPropagation(); // Prevent event from bubbling to OrbitControls
-    if (onDraggingChanged) {
-      onDraggingChanged(false); // Notify parent that dragging has stopped
-    }
-  };
+  }, [onDraggingChanged]);
 
   const handleControlsChange = () => {
     if (onGizmoChange && settings.target) {
@@ -77,7 +79,7 @@ export const TransformGizmo: React.FC<TransformGizmoProps> = ({
   };
 
   if (!settings.target) {
-    return null; // Don't render gizmo if no target
+    return null;
   }
 
   return (
@@ -87,9 +89,6 @@ export const TransformGizmo: React.FC<TransformGizmoProps> = ({
       camera={camera}
       domElement={gl.domElement}
       onChange={handleControlsChange}
-      // Use pointer events to manage dragging state
-      onPointerDown={handleGizmoPointerDown}
-      onPointerUp={handleGizmoPointerUp}
       mode={settings.mode}
       size={settings.size}
       space={settings.space}

@@ -27,7 +27,11 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
   const openMenu = useCallback(
     (e: React.MouseEvent, ctx: Context = {}) => {
       e.preventDefault();
-      const raw = rulesRef.current.flatMap(r => r(ctx));
+      console.log('[ContextMenuProvider openMenu] Received ctx:', JSON.stringify(ctx)); // Log received ctx
+      const raw = rulesRef.current.flatMap(ruleFn => {
+        console.log('[ContextMenuProvider openMenu] Calling ruleFn with ctx:', JSON.stringify(ctx)); // Log ctx passed to rule
+        return ruleFn(ctx);
+      });
       const seen = new Set<string>();
       const items = raw.filter(item => {
         if (seen.has(item.key)) return false;

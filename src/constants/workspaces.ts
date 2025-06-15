@@ -1,0 +1,1 @@
+export const WORKSPACES_MAX_CAMERAS = 4;
